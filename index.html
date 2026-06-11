@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tu Cuarto, Tu Calma — Room Reset Guide</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2C2C2C">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+
+<!-- iOS home screen support -->
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tu Cuarto Tu Calma">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #F7F5F0; min-height: 100vh; }
+  button { font-family: inherit; cursor: pointer; }
+
+  #header { background: #2C2C2C; padding: 20px 20px 16px; color: #fff; }
+  #header .eyebrow { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #A8C5A0; margin-bottom: 4px; }
+  #header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  #header .sub { font-size: 13px; color: #AAA; margin-top: 4px; }
+
+  #nav { overflow-x: auto; padding: 12px 16px; display: flex; gap: 8px; background: #EDEAE3; border-bottom: 1px solid #DDD; white-space: nowrap; }
+  .nav-btn { padding: 7px 14px; border-radius: 20px; border: 2px solid transparent; background: #fff; color: #2C2C2C; font-size: 13px; transition: all 0.15s; }
+  .nav-btn.active { font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+
+  #section-header { padding: 16px 20px 8px; }
+  #section-header h2 { font-size: 20px; font-weight: 700; color: #2C2C2C; }
+  #section-header p { font-size: 13px; color: #6B6560; margin-top: 2px; }
+
+  #content { padding: 8px 16px 40px; display: flex; flex-direction: column; gap: 12px; }
+
+  .card { background: #fff; border: 1px solid #EDEAE3; border-radius: 10px; padding: 14px 16px; }
+  .card-dark { background: #EDEAE3; }
+
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 20px; }
+  .tag-blue { background: #D0DCF0; color: #4A6FA5; }
+  .tag-sage { background: #D4E8D2; color: #7C9A7E; border: 1px solid #7C9A7E; }
+  .tag-warm { background: #EDD9C4; color: #C4956A; border: 1px solid #C4956A; }
+  .tag-premium { background: #D0DCF0; color: #4A6FA5; border: 1px solid #4A6FA5; }
+
+  .notice { border-radius: 8px; padding: 10px 14px; font-size: 13px; line-height: 1.5; }
+  .notice-red { background: #F0D8D2; border-left: 3px solid #C0614A; color: #2C2C2C; }
+  .notice-sage { background: #D4E8D2; color: #2C2C2C; }
+  .notice-blue { background: #D0DCF0; border: 1px solid #4A6FA5; color: #2C2C2C; }
+  .notice-warm { background: #EDD9C4; border: 1px solid #C4956A; color: #2C2C2C; }
+
+  .check-btn { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #6B6560; background: transparent; color: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .check-btn.checked { background: #7C9A7E; border-color: #7C9A7E; }
+
+  .zone-header { width: 100%; background: none; border: none; padding: 14px 16px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+  .zone-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .task-row { border-radius: 8px; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start; transition: all 0.2s; }
+  .task-row.done { opacity: 0.7; }
+
+  .impact-badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #fff; padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+
+  .energy-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; transition: all 0.15s; }
+
+  .solution-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; background: #EDEAE3; }
+
+  .shop-row { border-radius: 10px; padding: 10px 12px; border: 1px solid #EDEAE3; transition: all 0.2s; }
+  .shop-row.checked { background: #D4E8D2; opacity: 0.6; }
+
+  .spiral-row { display: flex; gap: 8px; font-size: 13px; color: #2C2C2C; padding: 4px 0; border-bottom: 1px solid #EDD9C4; }
+  .spiral-row:last-child { border-bottom: none; }
+
+  .rule-card { background: #fff; border: 1px solid #EDEAE3; border-radius: 10px; padding: 12px 14px; }
+
+  .tier-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; color: #6B6560; margin-bottom: 6px; text-transform: uppercase; }
+
+  #lock-screen { position: fixed; inset: 0; background: #2C2C2C; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; z-index: 1000; text-align: center; }
+  #lock-screen .lock-eyebrow { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #A8C5A0; }
+  #lock-screen h1 { font-size: 22px; font-weight: 700; }
+  #lock-screen input { width: 100%; max-width: 260px; padding: 12px 14px; border-radius: 8px; border: 2px solid #6B6560; background: #fff; color: #2C2C2C; font-size: 16px; text-align: center; }
+  #lock-screen input:focus { outline: none; border-color: #A8C5A0; }
+  #lock-screen button { width: 100%; max-width: 260px; padding: 12px 14px; border-radius: 8px; border: none; background: #7C9A7E; color: #fff; font-size: 15px; font-weight: 700; }
+  #lock-screen .lock-error { font-size: 13px; color: #C0614A; min-height: 16px; }
+  #app { display: none; }
+</style>
+</head>
+<body>
+
+<div id="lock-screen">
+  <div class="lock-eyebrow">Tu Cuarto, Tu Calma</div>
+  <h1>🔒 Acceso privado</h1>
+  <input type="password" id="lock-input" placeholder="Passcode" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+  <button id="lock-submit">Entrar</button>
+  <div class="lock-error" id="lock-error"></div>
+</div>
+
+<div id="app">
+<div id="header">
+  <div class="eyebrow">Room Reset · Japandi · 25,000 MXN</div>
+  <h1>Tu Cuarto, Tu Calma</h1>
+  <p class="sub">Interior design + organizer + ADHD-aware plan</p>
+</div>
+
+<div id="nav"></div>
+<div id="section-header"><h2></h2><p></p></div>
+<div id="content"></div>
+</div>
+
+<script>
+const P = {
+  bg:"#F7F5F0",bgDark:"#EDEAE3",ink:"#2C2C2C",inkLight:"#6B6560",
+  sage:"#7C9A7E",sageMid:"#A8C5A0",sageLight:"#D4E8D2",
+  warm:"#C4956A",warmLight:"#EDD9C4",
+  blue:"#4A6FA5",blueLight:"#D0DCF0",
+  red:"#C0614A",redLight:"#F0D8D2",white:"#FFFFFF"
+};
+
+const ENERGY = {
+  low:  {label:"🌿 Low Energy",   color:P.sageLight, border:P.sageMid},
+  medium:{label:"🔥 Medium Energy",color:P.warmLight,  border:P.warm},
+  high: {label:"⚡ High Energy",   color:P.blueLight,  border:P.blue}
+};
+
+const SECTIONS = [
+  {id:"mistakes", icon:"🔍", title:"What's Making It Feel Worse", sub:"Honest analysis from your photos",         color:P.redLight,   border:P.red},
+  {id:"declutter",icon:"🗂️", title:"1. Declutter Plan",           sub:"Zone by zone, no rabbit holes",            color:P.sageLight,  border:P.sage},
+  {id:"cleaning", icon:"✨", title:"2. Cleaning Plan",             sub:"After the clutter is gone",                color:P.bgDark,     border:P.inkLight},
+  {id:"storage",  icon:"📦", title:"3. Storage Recommendations",   sub:"Japandi-aligned, ADHD-friendly",           color:P.warmLight,  border:P.warm},
+  {id:"layout",   icon:"🛋️", title:"4. Furniture Layout",          sub:"Make the room work harder",                color:P.blueLight,  border:P.blue},
+  {id:"decor",    icon:"🌿", title:"5. Decor & Style",             sub:"Japandi + your blue backdrop",             color:P.sageLight,  border:P.sage},
+  {id:"shopping", icon:"🛒", title:"6. Shopping List",             sub:"Cheapest → most impactful",                color:P.warmLight,  border:P.warm},
+  {id:"adhd",     icon:"🧠", title:"7. ADHD Protocol",             sub:"Guardrails, bursts, energy matching",      color:P.blueLight,  border:P.blue},
+];
+
+const DATA = {
+  mistakes:[
+    {title:"The clothing rack is doing ALL the visual work — badly",detail:"An overloaded open rack is the single biggest chaos signal in the room. Your brain reads every hanging item as an unfinished task. It's the first thing eyes go to and the first thing to fix.",impact:"HIGHEST"},
+    {title:"Your desk has no clear identity",detail:"Keyboard, bottles, random items = the brain can't tell if this is a workspace or a storage shelf. A desk that doesn't look like a desk stops you from working at it psychologically.",impact:"HIGH"},
+    {title:"The blue wall reads as 'construction zone'",detail:"A flat blue panel with no framing looks unfinished. The good news: a simple curtain rod with linen panels can conceal it beautifully when not in use AND make it look intentional when it is.",impact:"HIGH"},
+    {title:"No visual 'landing' — nowhere for the eye to rest",detail:"Every surface has something on it at roughly the same density. Japandi works by contrast: full zones and empty zones. Right now everything competes equally.",impact:"HIGH"},
+    {title:"Floor items signal 'temporary' to the brain",detail:"Bags, laundry basket, shoes on the floor around the bed — even if everything were clean, this would read as 'someone is about to move.' Items belong on surfaces or in containers.",impact:"MEDIUM"},
+    {title:"The shelves have no system",detail:"Products, books, and random objects at the same level. The eye needs visual grouping: tall items together, categories together, or deliberate negative space.",impact:"MEDIUM"},
+    {title:"Lighting is single-point and harsh",detail:"One bright floor lamp creates one harsh angle. Japandi uses layered warm light. Adding one secondary light source (even a $150 MXN LED strip or bedside lamp) transforms the room's feel at night.",impact:"MEDIUM"},
+    {title:"Pink storage boxes are fighting the palette",detail:"They're useful, but the color actively clashes with the blue wall and the general tone. Concealing or replacing with natural/neutral tones removes visual noise.",impact:"LOW"},
+  ],
+  declutter:[
+    {zone:"Zone A: The Desk",priority:1,energy:"medium",tasks:[
+      {time:"15 min",task:"Remove everything from the desk surface. Put it all in a laundry basket — don't sort yet, just clear.",guardrail:"Do NOT start sorting what you removed. That's a different session."},
+      {time:"10 min",task:"From the basket: pull out only things that MUST live on the desk (laptop, keyboard, one cup for pens). Everything else stays in basket.",guardrail:"Resist putting things 'just for now.' If it hesitates, it goes."},
+      {time:"15 min",task:"Sort the basket: trash bag, donate box, 'belongs elsewhere' pile. One category at a time.",guardrail:"Stop when the 15 min is up. Leave the sorted piles — don't start carrying things to other rooms."},
+    ]},
+    {zone:"Zone B: The Clothing Rack",priority:2,energy:"high",tasks:[
+      {time:"20 min",task:"Remove everything from the floor around the rack. Floor items only — don't touch the rack itself. Bag into: clean (fold/hang later), dirty (laundry), or 'not clothes' (put aside).",guardrail:"Do not start reorganizing the rack during this session."},
+      {time:"20 min",task:"Go through the rack: pull out anything you haven't worn in 6+ months or doesn't fit. Two piles only: keep or donate. No 'maybe' pile.",guardrail:"'Maybe' always becomes clutter. If you have to think longer than 5 seconds, it goes."},
+      {time:"15 min",task:"Rehang what stays, organized by type: dresses together, tops together, bottoms together. Use the same direction for all hangers.",guardrail:"Don't reorganize by color or season yet — that's a future session."},
+    ]},
+    {zone:"Zone C: The Bed Area & Floor",priority:3,energy:"low",tasks:[
+      {time:"10 min",task:"Pick up everything from the floor on one side of the bed only. Categorize: trash, laundry, belongs elsewhere.",guardrail:"One side only. Done."},
+      {time:"10 min",task:"Clear the surfaces immediately next to the bed — keep only: lamp, phone charger, water bottle, one book. Everything else off.",guardrail:"Your bedside zone is sacred. Protect it."},
+      {time:"15 min",task:"Other side of bed floor. Same rules.",guardrail:"If you find yourself deep-cleaning under the bed: stop. That's a separate session."},
+    ]},
+    {zone:"Zone D: Shelves & Products",priority:4,energy:"medium",tasks:[
+      {time:"15 min",task:"One shelf only: remove everything, wipe it, put back only what belongs there grouped by category.",guardrail:"One shelf per session. Move on."},
+      {time:"15 min",task:"Products (skincare, hair, etc.): check for empties and expired items. Trash them. Don't reorganize yet — just purge.",guardrail:"Do not start a new skincare routine or reorganize by brand. Purge only."},
+      {time:"10 min",task:"Group remaining products by use: daily use vs. occasional. Daily use gets the best access.",guardrail:""},
+    ]},
+  ],
+  cleaning:[
+    {step:"Floors first",energy:"medium",time:"20 min",detail:"Sweep/mop tile floor once surfaces are cleared. Start near the door, work toward the window. Tile floors are a huge asset — they look amazing when clean."},
+    {step:"Dust all shelves top to bottom",energy:"low",time:"15 min",detail:"Work top to bottom so dust falls down. Microfiber cloth or damp rag. Do one wall's shelves per session."},
+    {step:"Wipe the desk surface",energy:"low",time:"10 min",detail:"After decluttering: disinfect wipe, then dry cloth. This is the ritual that 'opens' your workspace."},
+    {step:"Windows and curtains",energy:"high",time:"20 min",detail:"Wipe window glass. Shake out any curtains or fabric panels. This changes the light quality noticeably."},
+    {step:"Fan blades",energy:"low",time:"10 min",detail:"Dusty fan blades circulate dusty air. Pillowcase method: slip case over each blade, pull off — dust goes inside the case."},
+    {step:"Under the bed",energy:"high",time:"20 min",detail:"Only tackle this after all other zones are done. Remove, sort, decide if under-bed storage is useful or if everything there should leave."},
+  ],
+  storage:[
+    {category:"Clothing System",icon:"👗",problem:"Open overloaded rack = permanent visual chaos",solutions:[
+      {budget:"Budget",item:"Añadir segunda barra debajo del rack existente",price:"~$150 MXN",note:"Doubles hanging capacity, forces you to keep only what fits"},
+      {budget:"Mid",item:"Cajas de tela con tapa (tipo IKEA Skubb) para el rack",price:"~$400–600 MXN",note:"Store folded items on the rack shelf, concealed, Japandi-compatible"},
+      {budget:"Premium",item:"Biombo de madera o cortina de lino para cubrir el rack",price:"~$1,500–2,500 MXN",note:"Conceals everything, looks intentional, huge visual upgrade"},
+    ]},
+    {category:"Desk Organization",icon:"💻",problem:"No zones = everything piles up everywhere",solutions:[
+      {budget:"Budget",item:"Organizador de bambú para escritorio (porta-lápices, bandejas)",price:"~$200–400 MXN",note:"Bamboo reads Japandi, costs almost nothing"},
+      {budget:"Mid",item:"Cable management box de madera + velcro ties",price:"~$350–600 MXN",note:"Cables under desk are a major hidden mess driver"},
+      {budget:"Premium",item:"Monitor stand con almacenamiento integrado",price:"~$800–1,500 MXN",note:"Raises laptop to eye level (ergonomics) + clears surface space below"},
+    ]},
+    {category:"Products & Skincare",icon:"🧴",problem:"Products scattered across multiple surfaces",solutions:[
+      {budget:"Budget",item:"Charola de madera o bandeja de bambú para productos diarios",price:"~$150–250 MXN",note:"A tray makes a collection look intentional vs. scattered"},
+      {budget:"Mid",item:"Organizador acrílico de 2–3 niveles para skincare",price:"~$300–500 MXN",note:"Clear = you see everything, use everything, stop buying duplicates"},
+      {budget:"Premium",item:"Estante de pared pequeño para productos (flotante)",price:"~$600–900 MXN",note:"Gets products OFF the main surfaces, vertical space is free"},
+    ]},
+    {category:"Floor & Catch-All Zones",icon:"🧺",problem:"Bags, shoes, laundry basket all read as 'temporary'",solutions:[
+      {budget:"Budget",item:"Cesta de mimbre o yute para ropa sucia (reemplaza el cesto de plástico)",price:"~$250–450 MXN",note:"Same function, looks intentional, Japandi-perfect"},
+      {budget:"Mid",item:"Perchero de pared de madera (3–5 ganchos) para bolsas y accesorios",price:"~$350–700 MXN",note:"Bags OFF the floor permanently — huge impact"},
+      {budget:"Premium",item:"Banco de entrada con almacenamiento (asiento + canastas abajo)",price:"~$1,200–2,000 MXN",note:"Shoes zone becomes intentional, doubles as seating"},
+    ]},
+  ],
+  layout:[
+    {title:"The Blue Wall → Work Corner",description:"Your backdrop is fixed, so design around it rather than against it. Position your desk DIRECTLY in front of or perpendicular to the blue wall. This makes it a proper work zone, not a random blue panel in the middle of your life. Add a small rug under the desk to define the zone.",impact:"Transforms it from 'construction flaw' to 'intentional home studio corner'"},
+    {title:"Bed: Pull Away From the Wall",description:"If your bed is against the wall: pull it out ~60cm. This one move makes the room feel larger, allows making the bed properly, and opens under-bed storage. If you add a small headboard or a large piece of fabric/tapestry on the wall behind it, the bed becomes the room's anchor.",impact:"Makes the room feel like a bedroom instead of a storage unit with a bed in it"},
+    {title:"Create One Empty Wall",description:"Looking at your photos, every wall has stuff. Japandi principle: designate ONE wall section that is intentionally empty (or has only one large simple element). This gives the eye somewhere to rest. The tile floor + empty wall = instant calm.",impact:"Psychological calm — the brain stops 'cataloging' the room"},
+    {title:"Clothing Rack: Perpendicular or Concealed",description:"If the rack must stay open: position it perpendicular to the wall so it reads as furniture, not a pile. Add identical hangers (any one type — not mixed). If you add the curtain/biombo concealment, it can go anywhere.",impact:"Reduces visual chaos by ~40% with zero purchasing"},
+    {title:"Define Zones with Rugs",description:"Tile floors are beautiful but non-directional — they don't tell the brain where things are. A rug under the bed (even 90x160cm) and a small rug under the desk separates 'sleep zone' from 'work zone' visually and psychologically.",impact:"Zone clarity = less decision fatigue about where to be/what to do"},
+  ],
+  decor:[
+    {category:"Handling the Blue Backdrop",ideas:[
+      "Install a curtain rod across that wall section. Natural linen or white curtains hang in front. For work: pull them aside. Not working: close them. The room looks complete either way.",
+      "If you can't install a rod: a tall bamboo screen/biombo in front of it creates a partial concealment that reads as intentional room divider.",
+      "BONUS: A large mirror leaning against the wall adjacent to the blue would reflect light and make the room feel significantly larger.",
+    ]},
+    {category:"Japandi Color Direction",ideas:[
+      "Your tile floors and the existing blue are actually workable: Japandi can handle blue as an accent if everything else is very neutral (white, cream, natural wood, linen).",
+      "Swap bright or warm-toned items for: sand, warm white, charcoal, natural wood, muted sage green.",
+      "One or two plants (pothos, snake plant, ZZ plant — all low-light, low-maintenance) add the 'wabi-sabi' softness that Japandi requires.",
+      "Replace the pink storage boxes with natural rattan or white/beige fabric boxes.",
+    ]},
+    {category:"Lighting Layers",ideas:[
+      "Current: one harsh floor lamp. Target: at least two light sources at different heights.",
+      "Budget fix: warm LED strip behind/under the bed or desk ($150–250 MXN). Instantly changes the mood.",
+      "A small lamp on the desk or nightstand with a warm (2700K) bulb makes the room feel safe and adult.",
+      "The floor lamp you have is fine — just supplement it, don't replace it.",
+    ]},
+    {category:"The 'Adult Room' Markers",ideas:[
+      "One large piece of art or a gallery wall (even printed photos in matching frames) above the bed.",
+      "Matching or intentionally mixed throw pillows on the bed — this single change makes a bed look 'designed.'",
+      "One real plant in a ceramic or woven pot (not plastic).",
+      "Everything in one room should feel like it was chosen — not accumulated. That's the core principle.",
+    ]},
+  ],
+  shopping:[
+    {priority:1, item:"Cesta de mimbre/yute para ropa sucia",           price:"$250–350 MXN",   category:"Storage",   impact:"Replaces plastic basket, instant Japandi + looks intentional", tier:"Budget"},
+    {priority:2, item:"Organizador de bambú para escritorio (set)",     price:"$200–400 MXN",   category:"Desk",      impact:"Desk goes from chaotic to functional. Bamboo reads the right style.", tier:"Budget"},
+    {priority:3, item:"Charola de bambú o madera para productos",       price:"$150–250 MXN",   category:"Products",  impact:"Groups scattered items, looks deliberate", tier:"Budget"},
+    {priority:4, item:"Tira LED cálida (warm white, 2700K, 2–3m)",      price:"$150–300 MXN",   category:"Lighting",  impact:"Second light source transforms nighttime room feel completely", tier:"Budget"},
+    {priority:5, item:"Perchas idénticas para rack (pack 20–30)",       price:"$150–300 MXN",   category:"Clothing",  impact:"Matching hangers make ANY rack look 50% more organized instantly", tier:"Budget"},
+    {priority:6, item:"Perchero de pared de madera (ganchos p/bolsas)", price:"$350–700 MXN",   category:"Storage",   impact:"Bags off the floor PERMANENTLY", tier:"Budget-Mid"},
+    {priority:7, item:"Organizador acrílico 2–3 niveles (skincare)",    price:"$300–500 MXN",   category:"Products",  impact:"See everything, stop buying duplicates, surfaces clear", tier:"Mid"},
+    {priority:8, item:"Cable management box de madera",                 price:"$350–600 MXN",   category:"Desk",      impact:"Desk cables are a hidden mess driver. One box clears them.", tier:"Mid"},
+    {priority:9, item:"Planta interior + maceta cerámica",              price:"$200–400 MXN",   category:"Decor",     impact:"Alive element = room feels cared for", tier:"Mid"},
+    {priority:10,item:"Tapete para zona de cama (90x160cm mínimo)",     price:"$600–1,200 MXN", category:"Layout",    impact:"Defines sleep zone, warms the tile floor, huge visual upgrade", tier:"Mid"},
+    {priority:11,item:"Cortina de lino para cubrir la pared azul",      price:"$600–1,200 MXN", category:"Blue Wall", impact:"Conceals backdrop when not in use, makes room feel finished", tier:"Mid"},
+    {priority:12,item:"Cajas de tela con tapa (2–4 unidades)",          price:"$400–700 MXN",   category:"Clothing",  impact:"Conceals folded items, Japandi-compatible", tier:"Mid"},
+    {priority:13,item:"Lámpara de mesa/buró (warm white bulb)",         price:"$400–800 MXN",   category:"Lighting",  impact:"Second real light source, makes room feel designed not dorm-like", tier:"Mid"},
+    {priority:14,item:"Marco grande + impresión para pared sobre cama", price:"$400–900 MXN",   category:"Decor",     impact:"Anchor for the bed wall. Makes room feel like it has a design intention.", tier:"Mid"},
+    {priority:15,item:"Monitor stand con almacenamiento",               price:"$800–1,500 MXN", category:"Desk",      impact:"Ergonomics + clears desk surface + looks professional", tier:"Premium"},
+    {priority:16,item:"Biombo de madera/bambú para cubrir rack",        price:"$1,200–2,500 MXN",category:"Clothing", impact:"Conceals the rack entirely — room looks like a room not a store", tier:"Premium"},
+    {priority:17,item:"Tapete para zona de trabajo/escritorio",         price:"$500–1,000 MXN", category:"Layout",    impact:"Defines workspace zone, pairs with bed rug to structure the room", tier:"Premium"},
+    {priority:18,item:"Banco con almacenamiento (zapatos/entrada)",     price:"$1,200–2,000 MXN",category:"Storage",  impact:"Makes the entry/shoe zone intentional and functional", tier:"Premium"},
+  ],
+  adhd:{
+    rules:[
+      {rule:"One zone per session. Always.",detail:"Before you start, name the zone OUT LOUD or in writing: 'I am doing the desk surface. Only the desk surface.' When you feel the pull to do something else, that's the signal you've hit your limit — not that you should keep going."},
+      {rule:"15–20 minute bursts with a timer. Non-negotiable.",detail:"Set a phone timer. When it goes off, you stop. Even if you're 'on a roll.' The goal is sustainable momentum, not the perfect session. Half a zone done today beats a full zone started and abandoned."},
+      {rule:"The 'parking lot' method for rabbit holes.",detail:"When you think of something else you should do ('while I'm at it I should organize my shoes...'): write it on a sticky note or phone note called PARKING LOT. It's captured. You're not losing it. Now return to your current zone."},
+      {rule:"Match task to energy, not schedule.",detail:"Don't try to do high-energy tasks on anergia days. Use the energy levels on each task. On low days: just walk into the room and put one thing away. That counts."},
+      {rule:"Define 'done' before you start.",detail:"Before each burst, finish this sentence: 'This session is done when ___.' Example: 'This session is done when the desk surface is clear and everything is in the basket.' NOT 'when the desk is organized.' Those are different tasks."},
+      {rule:"Stopping mid-task is allowed and valid.",detail:"If you feel the spiral coming (you've been at it 45 min, you're now reorganizing a drawer you didn't plan to touch, you're frustrated) — stop. Close the door if you need to. A half-done zone won't get worse overnight."},
+      {rule:"Reward the start, not the finish.",detail:"Tell yourself: 'I just have to start the timer.' That's the only ask. ADHD brains hate initiation more than continuation. Starting IS the achievement."},
+    ],
+    energyMap:[
+      {level:"low",label:"🌿 Anergia / Low Day",tasks:[
+        "Put away 5 things that are obviously in the wrong place",
+        "Take out one piece of trash from your room",
+        "Make the bed (just pull the blanket up — it counts)",
+        "Put one clean laundry pile in the basket",
+        "Wipe the desk with one cloth",
+      ]},
+      {level:"medium",label:"🔥 Normal / Functional Day",tasks:[
+        "Clear one full surface (desk, shelf, nightstand)",
+        "Do one 15-min zone task from the plan",
+        "Wipe down one shelf and reorganize it",
+        "Go through one category (shoes, bags, products)",
+        "Hang or fold one basket of clean laundry",
+      ]},
+      {level:"high",label:"⚡ Activation / High Energy Day",tasks:[
+        "Complete a full zone (2–3 burst tasks)",
+        "Tackle the clothing rack reorganization",
+        "Do a full floor sweep + mop",
+        "Go through clothes for a donate pile",
+        "Assemble or install a new storage item",
+      ]},
+    ],
+    spiral:[
+      "You've been working more than 45 minutes without a break",
+      "You moved on from the original zone without finishing it",
+      "You're now searching YouTube for 'how to organize a closet'",
+      "You've started 3 different tasks and none are done",
+      "You're reorganizing something that didn't need it",
+      "You feel frustrated or overwhelmed — that's exhaustion, not motivation",
+    ],
+  },
+};
+
+// State
+const state = { section:"mistakes", expandedZone:null, checked:{}, energy:"medium" };
+
+// Persist checks in localStorage
+function loadChecks(){ try{ const s=localStorage.getItem('room_checks'); if(s) Object.assign(state.checked, JSON.parse(s)); }catch(e){} }
+function saveChecks(){ try{ localStorage.setItem('room_checks', JSON.stringify(state.checked)); }catch(e){} }
+loadChecks();
+
+const IMPACT_COLOR = {HIGHEST:P.red,HIGH:P.warm,MEDIUM:P.sage,LOW:P.inkLight};
+
+function el(tag,attrs,children){
+  const e=document.createElement(tag);
+  if(attrs) Object.entries(attrs).forEach(([k,v])=>{ if(k==='style') Object.assign(e.style,v); else if(k==='class') e.className=v; else if(k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(),v); else e.setAttribute(k,v); });
+  if(children) (Array.isArray(children)?children:[children]).forEach(c=>{ if(c==null||c===false) return; e.appendChild(typeof c==='string'?document.createTextNode(c):c); });
+  return e;
+}
+function div(attrs,children){ return el('div',attrs,children); }
+function btn(attrs,children){ return el('button',attrs,children); }
+function span(attrs,children){ return el('span',attrs,children); }
+
+function toggle(key){ state.checked[key]=!state.checked[key]; saveChecks(); render(); }
+function checkBtn(key){
+  const b=btn({class:'check-btn '+(state.checked[key]?'checked':''),onClick:()=>toggle(key)}, state.checked[key]?'✓':'');
+  return b;
+}
+
+function renderMistakes(){
+  return DATA.mistakes.map(m=>
+    div({class:'card',style:{borderLeft:`4px solid ${IMPACT_COLOR[m.impact]}`}},[
+      div({style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'8px'}},[
+        div({style:{fontWeight:600,fontSize:'14px',color:P.ink,lineHeight:'1.4'}},m.title),
+        span({class:'impact-badge',style:{background:IMPACT_COLOR[m.impact]}},m.impact),
+      ]),
+      div({style:{fontSize:'13px',color:P.inkLight,marginTop:'6px',lineHeight:'1.5'}},m.detail),
+    ])
+  );
+}
+
+function renderDeclutter(){
+  const items=[
+    div({class:'notice notice-red'},[el('strong',{},'⚠️ GUARDRAIL:'),' Complete zones in order. Do not skip to Zone B until Zone A tasks are done. This is the rule that protects you.']),
+  ];
+  DATA.declutter.forEach((z,zi)=>{
+    const open=state.expandedZone===zi;
+    const wrap=div({class:'card',style:{padding:'0',overflow:'hidden'}},[]);
+    const header=btn({class:'zone-header',onClick:()=>{ state.expandedZone=open?null:zi; render(); }},[
+      div({},[
+        div({style:{fontWeight:700,fontSize:'14px',color:P.ink}},[
+          span({style:{color:P.warm,marginRight:'8px'}},'#'+z.priority), z.zone
+        ]),
+        div({style:{fontSize:'12px',color:P.inkLight,marginTop:'2px'}},z.tasks.length+' tasks · Energy: '+ENERGY[z.energy].label),
+      ]),
+      span({style:{fontSize:'18px',color:P.inkLight}},open?'▲':'▼'),
+    ]);
+    wrap.appendChild(header);
+    if(open){
+      const body=div({class:'zone-body'},[]);
+      z.tasks.forEach((t,ti)=>{
+        const key=`d-${zi}-${ti}`;
+        const done=state.checked[key];
+        const row=div({class:'task-row '+(done?'done':''),style:{background:done?P.sageLight:P.bgDark}},[
+          checkBtn(key),
+          div({style:{flex:1}},[
+            div({style:{marginBottom:'4px'}},[span({class:'tag tag-blue'},'⏱ '+t.time)]),
+            div({style:{fontSize:'13px',color:P.ink,lineHeight:'1.4',textDecoration:done?'line-through':'none'}},t.task),
+            t.guardrail?div({style:{fontSize:'12px',color:P.red,marginTop:'6px',fontStyle:'italic'}},'🛑 '+t.guardrail):null,
+          ]),
+        ]);
+        body.appendChild(row);
+      });
+      wrap.appendChild(body);
+    }
+    items.push(wrap);
+  });
+  return items;
+}
+
+function renderCleaning(){
+  const items=[div({class:'notice notice-sage'},[el('strong',{},'💡 Cleaning comes AFTER decluttering.'),' Cleaning around clutter wastes time and energy. These steps assume the zones are cleared first.'])];
+  DATA.cleaning.forEach((s,i)=>{
+    const key=`c-${i}`;
+    const done=state.checked[key];
+    const e=ENERGY[s.energy];
+    items.push(div({class:'card',style:{opacity:done?'0.7':'1',background:done?P.sageLight:P.white}},[
+      div({style:{display:'flex',gap:'10px',alignItems:'flex-start'}},[
+        checkBtn(key),
+        div({style:{flex:1}},[
+          div({style:{display:'flex',gap:'8px',flexWrap:'wrap',marginBottom:'4px'}},[
+            span({style:{fontWeight:700,fontSize:'14px',color:P.ink}},s.step),
+            span({class:'tag',style:{background:e.color,border:`1px solid ${e.border}`}},e.label),
+            span({class:'tag tag-blue'},'⏱ '+s.time),
+          ]),
+          div({style:{fontSize:'13px',color:P.inkLight,lineHeight:'1.5'}},s.detail),
+        ]),
+      ]),
+    ]));
+  });
+  return items;
+}
+
+function renderStorage(){
+  return DATA.storage.map(cat=>
+    div({class:'card',style:{padding:'0',overflow:'hidden'}},[
+      div({class:'card-dark',style:{padding:'12px 16px'}},[
+        div({style:{fontWeight:700,fontSize:'14px',color:P.ink}},cat.icon+' '+cat.category),
+        div({style:{fontSize:'12px',color:P.red,marginTop:'2px'}},'⚠ '+cat.problem),
+      ]),
+      div({style:{padding:'12px 16px',display:'flex',flexDirection:'column',gap:'8px'}},
+        cat.solutions.map(s=>{
+          const bc=s.budget==='Budget'?{bg:P.sageLight,bdr:P.sage}:s.budget==='Mid'?{bg:P.warmLight,bdr:P.warm}:{bg:P.blueLight,bdr:P.blue};
+          return div({class:'solution-row'},[
+            span({class:'tag',style:{background:bc.bg,border:`1px solid ${bc.bdr}`,marginTop:'2px'}},s.budget),
+            div({style:{flex:1}},[
+              div({style:{fontSize:'13px',fontWeight:600,color:P.ink}},s.item),
+              div({style:{fontSize:'12px',color:P.warm,fontWeight:700,marginTop:'2px'}},s.price),
+              div({style:{fontSize:'12px',color:P.inkLight,marginTop:'2px'}},s.note),
+            ]),
+          ]);
+        })
+      ),
+    ])
+  );
+}
+
+function renderLayout(){
+  return DATA.layout.map(l=>
+    div({class:'card',style:{borderLeft:`4px solid ${P.blue}`}},[
+      div({style:{fontWeight:700,fontSize:'14px',color:P.ink,marginBottom:'6px'}},l.title),
+      div({style:{fontSize:'13px',color:P.inkLight,lineHeight:'1.5',marginBottom:'8px'}},l.description),
+      div({class:'notice',style:{background:P.blueLight,color:P.blue,padding:'6px 10px',fontStyle:'italic'}},'💡 '+l.impact),
+    ])
+  );
+}
+
+function renderDecor(){
+  return DATA.decor.map(cat=>
+    div({class:'card'},[
+      div({style:{fontWeight:700,fontSize:'14px',color:P.ink,marginBottom:'10px',borderBottom:`1px solid ${P.bgDark}`,paddingBottom:'8px'}},cat.category),
+      div({style:{display:'flex',flexDirection:'column',gap:'8px'}},
+        cat.ideas.map(idea=>div({style:{display:'flex',gap:'8px',fontSize:'13px',color:P.inkLight,lineHeight:'1.5'}},[
+          span({style:{color:P.sage,flexShrink:'0'}},'◆'), span({},idea)
+        ]))
+      ),
+    ])
+  );
+}
+
+function renderShopping(){
+  const tiers=["Budget","Budget-Mid","Mid","Premium"];
+  const items=[
+    div({class:'notice notice-sage'},[el('strong',{},'Strategy:'),' Buy Budget items first. Assess what you actually need. Then Mid. Premium only if you still want it after the room transformation.']),
+  ];
+  tiers.forEach(tier=>{
+    const list=DATA.shopping.filter(s=>s.tier===tier);
+    if(!list.length) return;
+    items.push(div({style:{marginTop:'8px'}},[
+      div({class:'tier-label'},tier+' Tier'),
+      div({style:{display:'flex',flexDirection:'column',gap:'8px'}},
+        list.map(s=>{
+          const key=`sh-${s.priority}`;
+          const done=state.checked[key];
+          return div({class:'shop-row '+(done?'checked':''),style:{background:done?P.sageLight:P.white}},[
+            div({style:{display:'flex',gap:'10px',alignItems:'flex-start'}},[
+              checkBtn(key),
+              div({style:{flex:1}},[
+                div({style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'8px'}},[
+                  div({style:{fontSize:'13px',fontWeight:600,color:P.ink,textDecoration:done?'line-through':'none'}},s.item),
+                  span({style:{fontSize:'13px',fontWeight:700,color:P.warm,flexShrink:'0'}},s.price),
+                ]),
+                div({style:{fontSize:'11px',color:P.inkLight,marginTop:'2px'}},s.category+' · '+s.impact),
+              ]),
+            ]),
+          ]);
+        })
+      ),
+    ]));
+  });
+  items.push(div({class:'notice notice-warm',style:{marginTop:'8px'}},[
+    div({style:{fontWeight:700,fontSize:'13px',color:P.ink,marginBottom:'4px'}},'💰 Budget Estimate (full list)'),
+    div({style:{fontSize:'13px',color:P.inkLight}},'Budget items only: ~$3,000–5,000 MXN\nBudget + Mid: ~$8,000–13,000 MXN\nFull list: ~$14,000–22,000 MXN\n\nWell within your 25,000 MXN budget — with room for adjustments after you see what you already have that can stay.'),
+  ]));
+  return items;
+}
+
+function renderADHD(){
+  const d=DATA.adhd;
+  const items=[
+    div({class:'notice notice-blue'},[
+      div({style:{fontWeight:700,fontSize:'14px',color:P.ink,marginBottom:'4px'}},'Your brain is not broken. The process is wrong.'),
+      div({style:{fontSize:'13px',color:P.inkLight,lineHeight:'1.5'}},'Standard decluttering advice is designed for neurotypical brains with consistent energy and no activation barrier. This plan is designed for yours: start small, stay scoped, match energy, stop before the crash.'),
+    ]),
+    div({style:{marginTop:'4px'}},[
+      div({style:{fontWeight:700,fontSize:'13px',letterSpacing:'1px',textTransform:'uppercase',color:P.inkLight,marginBottom:'8px'}},'The 7 Rules'),
+      div({style:{display:'flex',flexDirection:'column',gap:'8px'}},
+        d.rules.map((r,i)=>div({class:'rule-card'},[
+          div({style:{fontWeight:700,fontSize:'13px',color:P.ink,marginBottom:'4px'}},[span({style:{color:P.warm}},'Rule '+(i+1)+': '),r.rule]),
+          div({style:{fontSize:'13px',color:P.inkLight,lineHeight:'1.5'}},r.detail),
+        ]))
+      ),
+    ]),
+    div({style:{marginTop:'4px'}},[
+      div({style:{fontWeight:700,fontSize:'13px',letterSpacing:'1px',textTransform:'uppercase',color:P.inkLight,marginBottom:'8px'}},'Tasks By Energy Level'),
+      div({style:{display:'flex',gap:'6px',marginBottom:'10px',flexWrap:'wrap'}},
+        d.energyMap.map(e=>{
+          const active=state.energy===e.level;
+          const eg=ENERGY[e.level];
+          return btn({
+            class:'energy-btn',
+            style:{border:`2px solid ${eg.border}`,background:active?eg.border:eg.color,color:active?P.white:P.ink,fontWeight:active?'700':'400'},
+            onClick:()=>{ state.energy=e.level; render(); }
+          },e.label);
+        })
+      ),
+      ...d.energyMap.filter(e=>e.level===state.energy).map(e=>{
+        const eg=ENERGY[e.level];
+        return div({class:'card',style:{border:`1px solid ${eg.border}`}},
+          e.tasks.map((t,ti)=>{
+            const key=`en-${e.level}-${ti}`;
+            const done=state.checked[key];
+            return div({style:{display:'flex',gap:'10px',alignItems:'center',padding:'8px 0',borderBottom:ti<e.tasks.length-1?`1px solid ${P.bgDark}`:'none',opacity:done?'0.5':'1'}},[
+              checkBtn(key),
+              span({style:{fontSize:'13px',color:P.ink,textDecoration:done?'line-through':'none'}},t),
+            ]);
+          })
+        );
+      }),
+    ]),
+    div({style:{marginTop:'4px'}},[
+      div({style:{fontWeight:700,fontSize:'13px',letterSpacing:'1px',textTransform:'uppercase',color:P.red,marginBottom:'8px'}},'🚨 Stop Signs (Spiral Check)'),
+      div({class:'card',style:{background:P.redLight,border:`1px solid ${P.red}`}},[
+        div({style:{fontSize:'13px',color:P.ink,marginBottom:'8px'}},'If any of these are true: stop, save progress, close the door.'),
+        ...d.spiral.map((s,i)=>div({class:'spiral-row'},[span({style:{color:P.red}},'⚠'),s])),
+      ]),
+    ]),
+  ];
+  return items;
+}
+
+const RENDERERS = {mistakes:renderMistakes,declutter:renderDeclutter,cleaning:renderCleaning,storage:renderStorage,layout:renderLayout,decor:renderDecor,shopping:renderShopping,adhd:renderADHD};
+
+function render(){
+  const sec=SECTIONS.find(s=>s.id===state.section);
+
+  // Nav
+  const nav=document.getElementById('nav');
+  nav.innerHTML='';
+  SECTIONS.forEach(s=>{
+    const active=s.id===state.section;
+    const b=btn({class:'nav-btn '+(active?'active':''),style:{border:`2px solid ${active?s.border:'transparent'}`,background:active?s.color:P.white},onClick:()=>{ state.section=s.id; render(); }},s.icon+' '+s.title.replace(/^\d+\.\s*/,''));
+    nav.appendChild(b);
+  });
+
+  // Section header
+  document.querySelector('#section-header h2').textContent=sec.icon+' '+sec.title;
+  document.querySelector('#section-header p').textContent=sec.sub;
+
+  // Content
+  const content=document.getElementById('content');
+  content.innerHTML='';
+  const nodes=RENDERERS[state.section]();
+  (Array.isArray(nodes)?nodes:[nodes]).forEach(n=>{ if(n) content.appendChild(n); });
+}
+
+render();
+
+// PWA: register service worker for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
+
+// --- Passcode lock ---
+const LOCK_HASH = '53163ccf7326a1b5dce7a30bcd63ce7e669f24cffe83be43d2332ee253c4f681';
+const LOCK_KEY = 'tcc_unlocked';
+
+async function sha256Hex(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function showApp(){
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+if (localStorage.getItem(LOCK_KEY) === '1') {
+  showApp();
+} else {
+  document.getElementById('lock-screen').style.display = 'flex';
+  const input = document.getElementById('lock-input');
+  const error = document.getElementById('lock-error');
+  const tryUnlock = async () => {
+    const hash = await sha256Hex(input.value);
+    if (hash === LOCK_HASH) {
+      localStorage.setItem(LOCK_KEY, '1');
+      showApp();
+    } else {
+      error.textContent = 'Passcode incorrecto';
+      input.value = '';
+      input.focus();
+    }
+  };
+  document.getElementById('lock-submit').addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+}
+</script>
+</body>
+</html>
